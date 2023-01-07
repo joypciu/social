@@ -11,7 +11,7 @@ function App() {
         .get('http://localhost:5000/api/activities')
         .then((response) => response.data),
     {
-      refetchInterval: 360 * 100,
+      refetchInterval: 360 * 360,
     }
   );
   let activities = data ?? [];
