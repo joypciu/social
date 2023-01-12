@@ -6,23 +6,27 @@ import ActivityDashboard from '../../features/activities/dashboard/ActivityDashb
 import { Activity } from '../../models/activity';
 import Navbar from './Navbar';
 import { v4 as uuid } from 'uuid';
+import agent from '../api/agent';
+import LoadingComponent from './LoadingComponent';
 
 function App() {
   const [activities, setActivities] = useState<Activity[]>([]);
+  const [submitting, setSubmitting] = useState(false);
+
   const { isLoading, error } = useQuery(
     ['activities'],
-    () =>
-      axios
-        .get<Activity[]>('http://localhost:5000/api/activities')
-        .then((response) => {
-          return response.data;
-        }),
+    () => agent.Activities.list(),
     {
       // onSuccess(data) {
       //   setActivities(data);
       // },
       onSettled(data, error) {
-        setActivities(data!);
+        let activities: Activity[] = [];
+        data?.forEach((activity) => {
+          activity.date = activity.date.split('T')[0];
+          activities.push(activity);
+        });
+        setActivities(activities);
         if (error) {
           throw new Error('fetching not successfull');
         }
@@ -51,23 +55,38 @@ function App() {
     setEditMode(false);
   }
   function handleCreateOrEditActivity(activity: Activity) {
-    activity.id
-      ? setActivities([
+    setSubmitting(true);
+    if (activity.id) {
+      agent.Activities.update(activity).then(() => {
+        setActivities([
           ...activities.filter((x) => x.id != activity.id),
           activity,
-        ])
-      : setActivities([...activities!, { ...activity, id: uuid() }]);
-
-    setEditMode(false);
-    setSelectedActivity(activity);
+        ]);
+        setSelectedActivity(activity);
+        setEditMode(false);
+        setSubmitting(false);
+      });
+    } else {
+      activity.id = uuid();
+      agent.Activities.create(activity).then(() => {
+        setActivities([...activities!, activity]);
+        setSelectedActivity(activity);
+        setEditMode(false);
+        setSubmitting(false);
+      });
+    }
   }
 
   function handleDeleteActivity(id: string) {
-    setActivities([...activities.filter((x) => x.id !== id)]);
+    setSubmitting(true);
+    agent.Activities.delete(id).then(() => {
+      setActivities([...activities.filter((x) => x.id !== id)]);
+      setSubmitting(false);
+    });
   }
 
   if (isLoading) {
-    return <h2>Loading....</h2>;
+    return <LoadingComponent />;
   }
   if (error instanceof Error) {
     return <h2>An error has occured {error.message}</h2>;
@@ -88,6 +107,7 @@ function App() {
             closeForm={handleFormClose}
             createOrEdit={handleCreateOrEditActivity}
             deleteActivity={handleDeleteActivity}
+            submitting={submitting}
           />
         )}
       </Container>
