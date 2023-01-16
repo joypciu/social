@@ -17,9 +17,7 @@ function App() {
     ['activities'],
     () => agent.Activities.list(),
     {
-      // onSuccess(data) {
-      //   setActivities(data);
-      // },
+    
       onSettled(data, error) {
         let activities: Activity[] = [];
         data?.forEach((activity) => {
