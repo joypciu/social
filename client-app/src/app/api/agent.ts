@@ -1,4 +1,4 @@
-import { Activity } from './../../models/activity';
+import { Activity } from '../models/activity';
 import axios, { AxiosResponse } from 'axios';
 
 const sleep = (delay: number) => {
@@ -33,7 +33,8 @@ const Activities = {
   list: () => requests.get<Activity[]>('/activities'),
   details: (id: string) => requests.get<Activity>(`/activities/${id}`),
   create: (activity: Activity) => requests.post<void>(`/activities/`, activity),
-  update: (activity: Activity) => requests.put<void>(`/activities/${activity.id}`, activity),
+  update: (activity: Activity) =>
+    requests.put<void>(`/activities/${activity.id}`, activity),
   delete: (id: string) => requests.del<void>(`/activities/${id}`),
 };
 

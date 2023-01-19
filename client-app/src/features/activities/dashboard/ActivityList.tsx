@@ -1,19 +1,12 @@
+import { observer } from 'mobx-react-lite';
 import { SyntheticEvent, useState } from 'react';
 import { Button, Item, Label, Segment } from 'semantic-ui-react';
-import { Activity } from '../../../models/activity';
+import { useStore } from '../../../app/stores/store';
 
-interface Props {
-  activities: Activity[];
-  selectActivity: (id: string) => void;
-  deleteActivity: (id: string) => void;
-  submitting: boolean;
-}
-export default function ActivityList({
-  activities,
-  selectActivity,
-  deleteActivity,
-  submitting,
-}: Props) {
+
+function ActivityList() {
+  const { activityStore } = useStore();
+  const {deleteActivity,activitiesByDate,loading} = activityStore;
   const [target, setTarget] = useState('');
   function handleActivityDelete(
     e: SyntheticEvent<HTMLButtonElement>,
@@ -25,11 +18,12 @@ export default function ActivityList({
   return (
     <Segment>
       <Item.Group divided>
-        {activities?.map((activity) => (
+        {activitiesByDate.map((activity) => (
           <Item key={activity.id}>
             <Item.Content>
               <Item.Header as='a'>{activity.title}</Item.Header>
               <Item.Meta>{activity.date.toString()}</Item.Meta>
+
               <Item.Description>
                 <div>{activity.description}</div>
                 <div>
@@ -38,14 +32,14 @@ export default function ActivityList({
               </Item.Description>
               <Item.Extra>
                 <Button
-                  onClick={() => selectActivity(activity.id)}
+                  onClick={() => activityStore.selectActivity(activity.id)}
                   floated='right'
                   content='view'
                   color='blue'
                 />
                 <Button
                   name={activity.id}
-                  loading={submitting && target === activity.id}
+                  loading={loading && target === activity.id}
                   onClick={(e) => handleActivityDelete(e, activity.id)}
                   floated='right'
                   content='delete'
@@ -60,3 +54,5 @@ export default function ActivityList({
     </Segment>
   );
 }
+
+export default observer(ActivityList);
