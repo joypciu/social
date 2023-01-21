@@ -1,21 +1,26 @@
 import { observer } from 'mobx-react-lite';
 import { Grid } from 'semantic-ui-react';
+import LoadingComponent from '../../../app/layout/LoadingComponent';
 import { useStore } from '../../../app/stores/store';
-import ActivityDetails from '../details/ActivityDetails';
-import ActivityForm from '../form/ActivityForm';
 import ActivityList from './ActivityList';
 
 function ActivityDashboard() {
   const { activityStore } = useStore();
-  const { selectedActivity, editMode } = activityStore;
+  activityStore.loadActivities();
+
+  if (activityStore.isLoading) {
+    return <LoadingComponent />;
+  }
+  if (activityStore.error !== '') {
+    return <h2>An error has occured {activityStore.error}</h2>;
+  }
   return (
     <Grid>
       <Grid.Column width='10'>
         <ActivityList />
       </Grid.Column>
       <Grid.Column width='6'>
-        {selectedActivity && !editMode && <ActivityDetails />}
-        {editMode && <ActivityForm />}
+        <h2>Activity filter</h2>
       </Grid.Column>
     </Grid>
   );
