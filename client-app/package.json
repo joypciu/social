@@ -10,10 +10,12 @@
   },
   "dependencies": {
     "@tanstack/react-query": "^4.20.4",
+    "@types/react-calendar": "^3.9.0",
     "axios": "^1.2.2",
     "mobx": "^6.7.0",
     "mobx-react-lite": "^3.4.0",
     "react": "^18.2.0",
+    "react-calendar": "^4.0.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.7.0",
     "semantic-ui-css": "^2.5.0",
